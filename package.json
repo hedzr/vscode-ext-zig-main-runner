@@ -1,0 +1,167 @@
+{
+  "name": "zig-main-runner",
+  "displayName": "zig main runner",
+  "description": "run zig main func and tests in-place",
+  "version": "1.0.1",
+  "publisher": "hedzr",
+  "license": "Apache 2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hedzr/vscode-ext-zig-main-runner"
+  },
+  "keywords": [
+    "main-func",
+    "zig-lang",
+    "runner",
+    "debugger",
+    "testing"
+  ],
+  "galleryBanner": {
+    "color": "#F2F2F2",
+    "theme": "light"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other",
+    "Debuggers",
+    "Programming Languages",
+    "Testing"
+  ],
+  "icon": "images/icon.png",
+  "activationEvents": [
+    "onLanguage:zig"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "title": "Enable CodeLens",
+        "command": "zig-main-runner.codeLens.enable",
+        "category": "Zig Main Runner"
+      },
+      {
+        "title": "Disable Codelens",
+        "command": "zig-main-runner.codeLens.disable",
+        "category": "Zig Main Runner"
+      },
+      {
+        "title": "Run or Debug main()",
+        "command": "zig-main-runner.codeLens.runOrDebug",
+        "category": "Zig Main Runner"
+      },
+      {
+        "title": "Enable Running main func Under Package context",
+        "command": "zig-main-runner.codeLens.runAsPackage",
+        "category": "Zig Main Runner"
+      },
+      {
+        "title": "Disable Running main func Under Package context (instead of running the single file)",
+        "command": "zig-main-runner.codeLens.runAsSingleFile",
+        "category": "Zig Main Runner"
+      },
+      {
+        "command": "zig-main-runner.helloWorld",
+        "title": "Hello World"
+      }
+    ],
+    "configuration": {
+      "title": "Zig Main Runner",
+      "properties": {
+        "zig-main-runner.main.enableCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable Run/Debug shortcut links onto func main()",
+          "order": 0
+        },
+        "zig-main-runner.main.run.mode": {
+          "type": "string",
+          "enum": [
+            "runInTerminal",
+            "asTask"
+          ],
+          "default": "asTask",
+          "description": "run mode of 'zig run'",
+          "order": 100
+        },
+        "zig-main-runner.main.run.asPackage": {
+          "type": "boolean",
+          "default": true,
+          "title": "Run main func under package context",
+          "description": "Run main func under package context or not (default is running the single file)",
+          "order": 101
+        },
+        "zig-main-runner.main.run.verbose": {
+          "type": "boolean",
+          "default": false,
+          "description": "add '-v' to 'zig run'",
+          "order": 150
+        },
+        "zig-main-runner.launch.mode": {
+          "type": "string",
+          "enum": [
+            "runInTerminal",
+            "run",
+            "debug"
+          ],
+          "enumDescriptions": [
+            "Zig Run In Terminal window",
+            "Run (vscode way)",
+            "Debug (vscode way)"
+          ],
+          "default": "runInTerminal",
+          "description": "The mode of launching from config could be: runInTerminal, run, debug.",
+          "order": 200
+        }
+      }
+    },
+    "taskDefinitions": [
+      {
+        "type": "zig-main-runner",
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "type": "string",
+            "description": "The Zig Run task to customize"
+          },
+          "file": {
+            "type": "string",
+            "description": "The Zig-Lang source file or folder that provides the task. Can be omitted."
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/common-ancestor-path": "^1.0.2",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "~18.19.34",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "common-ancestor-path": "^1.0.1"
+  }
+}
