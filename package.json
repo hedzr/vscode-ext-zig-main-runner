@@ -52,15 +52,27 @@
         "category": "Zig Main Runner"
       },
       {
-        "title": "Enable Running main func Under Package context",
+        "title": "Enable running main func under package context",
         "command": "zig-main-runner.codeLens.runAsPackage",
         "category": "Zig Main Runner"
       },
       {
-        "title": "Disable Running main func Under Package context (instead of running the single file)",
+        "title": "Disable running main func under package context (instead of running the single file)",
         "command": "zig-main-runner.codeLens.runAsSingleFile",
         "category": "Zig Main Runner"
       },
+
+      {
+        "title": "Run a Single Test",
+        "command": "zig-main-runner.codeLens.runSingleTest",
+        "category": "Zig Main Runner"
+      },
+      {
+        "title": "Run a File Test",
+        "command": "zig-main-runner.codeLens.runFileTest",
+        "category": "Zig Main Runner"
+      },
+
       {
         "command": "zig-main-runner.helloWorld",
         "title": "Hello World"

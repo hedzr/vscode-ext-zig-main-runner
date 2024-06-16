@@ -10,7 +10,7 @@ import * as taskProvider from './providers/task-provider';
 // import { AppScopeName, GolangId } from './util/consts';
 
 // let disposables: Disposable[] = [];
-let gorunTaskProvider: vscode.Disposable | undefined;
+let zigRunTaskProvider: vscode.Disposable | undefined;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -38,7 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const codelensProvider = new CodelensProvider();
 	codelensProvider.install(context);
-	gorunTaskProvider = taskProvider.install(context);
+	zigRunTaskProvider = taskProvider.install(context);
 
 	// console.log(context.storageUri);
 	// console.log(config.launches);
@@ -51,7 +51,7 @@ export function deactivate() {
 	// 	disposables.forEach(item => item.dispose());
 	// }
 	// disposables = [];
-	if (gorunTaskProvider) {
-		gorunTaskProvider.dispose();
+	if (zigRunTaskProvider) {
+		zigRunTaskProvider.dispose();
 	}
 }

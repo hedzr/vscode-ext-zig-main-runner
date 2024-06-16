@@ -189,7 +189,7 @@ export default class Term {
 		// determine the file location and number if it starts with a hash folder (e.g., '~work/rust.work/src/a.rs:996'),
 		// and jump to it in vscode editor.
 		(<any>vscode.window).registerTerminalLinkProvider({
-			provideTerminalLinks: (context: any, token: vscode.CancellationToken) => {
+			provideTerminalLinks: (context: any, _token: vscode.CancellationToken) => {
 				// Detect the first instance of the word "link" if it exists and linkify it
 				const re = /(~[^:]+)\:(\d+)/ig; // only match on tilde folders, normal `file:line` are ignored here.
 				const arr = re.exec(context.line as string);
@@ -214,7 +214,7 @@ export default class Term {
 				const line = link.data[2];
 				if (/^~[^/]+\//.test(file)) {
 					// resolve a tlide folder
-					this.execForText(`zsh -i -c 'hash -d'`, (err: Error, stdout: string | Buffer, stderr: string | Buffer) => {
+					this.execForText(`zsh -i -c 'hash -d'`, (_err: Error, stdout: string | Buffer, _stderr: string | Buffer) => {
 						let lines = stdout.toString().split('\n');
 						let l: string;
 						let res: RegExpExecArray | null;
@@ -237,7 +237,7 @@ export default class Term {
 		});
 
 		context.subscriptions.push(vscode.window.registerTerminalProfileProvider(`${AppScopeName}.terminal-profile`, {
-			provideTerminalProfile(token: vscode.CancellationToken): vscode.ProviderResult<vscode.TerminalProfile> {
+			provideTerminalProfile(_token: vscode.CancellationToken): vscode.ProviderResult<vscode.TerminalProfile> {
 				return {
 					options: {
 						name: 'Terminal API',

@@ -2,7 +2,7 @@
 
 import path from 'path';
 import * as vscode from 'vscode';
-import { AppScopeName, GolangId, ZigLangId } from '../util/consts';
+import { AppScopeName, ZigLangId } from '../util/consts';
 import * as cu from '../util/codelens-util';
 import { TSettings, settings } from '../util/settings-util';
 
@@ -11,8 +11,8 @@ import { TSettings, settings } from '../util/settings-util';
 // 	[index: number]: T;
 // }
 
-type func4Map = () => void;
-type funcMap = Map<string, func4Map>;
+// type func4Map = () => void;
+// type funcMap = Map<string, func4Map>;
 
 function getValue<T, K extends keyof T>(data: T, key: K) {
 	return data[key];
@@ -61,27 +61,27 @@ class DebugFileCodeLens extends FileCodeLens {
 }
 
 class TestFileCodeLens extends FileCodeLens {
-	constructor(file: string, range: vscode.Range, command?: vscode.Command) {
+	constructor(file: string, range: vscode.Range, filter: string, command?: vscode.Command) {
 		super(file, range, command);
 		// super.command = opts;
 		this.command = {
 			title: "Test the file", // title: `$(debug-start) Run`,
 			tooltip: "Run all tests in this file",
-			command: settings.launchMainFuncCmd,
-			arguments: [this.file]
+			command: settings.launchFileTestCmd,
+			arguments: [this.file, filter]
 		};
 	}
 }
 
 class TestSingleCodeLens extends FileCodeLens {
-	constructor(file: string, range: vscode.Range, command?: vscode.Command) {
+	constructor(file: string, range: vscode.Range, filter: string, command?: vscode.Command) {
 		super(file, range, command);
 		// super.command = opts;
 		this.command = {
 			title: "▷ Test this", // title: `$(debug-start) Run`,
 			tooltip: "Run this single test",
-			command: settings.launchMainFuncCmd,
-			arguments: [this.file]
+			command: settings.launchSingleTestCmd,
+			arguments: [this.file, filter]
 		};
 	}
 }
@@ -118,7 +118,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 		this.regex = /(?=\n?)func main\(\) (.*)/g;
 		// this.regex = /(.+)/g;
 		this.regexZig = /(?=\n?)pub fn main\(\) void (.*)/g;
-		this.regexZigTests = /(?=\n?)test \"[^"]*\" (.*)/g;
+		this.regexZigTests = /(?=\n?)test \"([^"]*)\" (.*)/g;
 
 		vscode.workspace.onDidChangeConfiguration((_) => {
 			this._onDidChangeCodeLenses.fire();
@@ -175,13 +175,14 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 
 	public provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
 		if (settings.enableCodeLens) {
-			const iszig = document.languageId === ZigLangId;
 			this.codeLenses = [];
 			this.locations = [];
+
 			console.log('doc: ', document.fileName, ', lang: ', document.languageId);
+			let matches;
+			const iszig = document.languageId === ZigLangId;
 			const regex = new RegExp(iszig ? this.regexZig : this.regex);
 			const text = document.getText();
-			let matches;
 			while ((matches = regex.exec(text)) !== null) {
 				const line = document.lineAt(document.positionAt(matches.index).line);
 				const indexOf = line.text.indexOf(matches[0]);
@@ -206,8 +207,8 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 					const range = document.getWordRangeAtPosition(position, new RegExp(this.regexZigTests));
 					if (range) {
 						const loc = <LocT>{ file: document.fileName, range: range };
-						this.codeLenses.push(new TestFileCodeLens(document.fileName, range));
-						this.codeLenses.push(new TestSingleCodeLens(document.fileName, range));
+						this.codeLenses.push(new TestSingleCodeLens(document.fileName, range, matches[1]));
+						this.codeLenses.push(new TestFileCodeLens(document.fileName, range, ''));
 						this.locations.push(loc);
 					}
 				}

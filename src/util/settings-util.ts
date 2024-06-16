@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { AppRunTerminalName, AppScopeName, GolangId, ZigLangId } from './consts';
+import { AppRunTerminalName, AppScopeName, ZigLangId } from './consts';
 import Term from '../terminal/term';
 import path from 'path';
 // import * as cp from 'child_process';
@@ -125,7 +125,7 @@ export function selectConfigAndRun(...args: any[]) {
     // Error: 'launch.json' does not exist for passed workspace folder
 }
 
-export interface GoRunTaskDefinition extends vscode.TaskDefinition {
+export interface ZigRunTaskDefinition extends vscode.TaskDefinition {
     /**
      * The task name
      */
@@ -145,19 +145,22 @@ export class launchableObj {
     mainGo: string;
     launchConfig: any;
 
-    constructor(src?: string, launchConfig?: any) {
+    constructor(whichCmd: string, filter: string, src: string, launchConfig?: any) {
         this.mainGo = src ?? focusedEditingFilePath();
         this.launchConfig = launchConfig;
 
-        if (focusedEditingFileLangId()===ZigLangId){
+        if (focusedEditingFileLangId() === ZigLangId) {
             this.gomod = this.mainGo;
             this.workDir = path.dirname(this.mainGo);
             const sources = this.mainGo; // settings.runAsPackage ? path.dirname(this.mainGo) : this.mainGo;
-            this.cmdline = `zig run ./${path.relative(this.workDir, sources)}`;
+            let filterArg = filter === '' ? '' : `--test-filter '${filter}'`;
+            this.cmdline = `zig ${whichCmd} ${filterArg} ./${path.relative(this.workDir, sources)}`;
             console.log(`built command for terminal '${AppRunTerminalName}': ${this.cmdline}`);
             return;
         }
-        
+
+        // specially for golang
+
         this.gomod = findGoMod(this.mainGo);
         if (!this.gomod) {
             vscode.window.showInformationMessage('Fail to go run: go.mod not found.');
@@ -215,9 +218,9 @@ export class launchableObj {
 
             const sources = settings.runAsPackage ? path.dirname(this.mainGo) : this.mainGo;
             const relName = `./${Path.relative(this.workDir, sources)}`;
-            const kind: GoRunTaskDefinition = {
+            const kind: ZigRunTaskDefinition = {
                 type: AppScopeName,
-                task: `go-main-run ${relName}`
+                task: `${AppScopeName} ${relName}`
             };
             const task = this.makeTask(kind, workspaceFolder, relName);
             if (task) {
@@ -252,7 +255,7 @@ export class launchableObj {
         });
     }
 
-    public makeTask(_def: GoRunTaskDefinition,
+    public makeTask(_def: ZigRunTaskDefinition,
         scope?: vscode.TaskScope.Global | vscode.TaskScope.Workspace | vscode.WorkspaceFolder,
         source?: string): vscode.Task | undefined {
         const task = _def.task;
@@ -278,7 +281,7 @@ export class launchableObj {
         // Make sure that this looks like a Rake task by checking that there is a task.
         if (task) {
             // resolveTask requires that the same definition object be used.
-            const definition: GoRunTaskDefinition = <any>_task.definition;
+            const definition: ZigRunTaskDefinition = <any>_task.definition;
             return this.getShellExecTask(
                 definition,
                 _task.scope ?? vscode.TaskScope.Workspace,
@@ -350,13 +353,23 @@ export function runWithConfig(runCmd: string, config?: any, callback?: () => voi
     //     // vscode.window.showInformationMessage('Error: ' + err.message);
     // });
 
-    const launchable = new launchableObj(undefined, config);
+    const launchable = new launchableObj('run', '', '', config);
     launchable.runWithConfig(runCmd, callback);
+}
+
+export function launchSingleTest(src: string, filter: string, config?: any, ..._extraArgs: any[]) {
+    const launchable = new launchableObj('test', filter, src, config);
+    launchable.run();
+}
+
+export function launchFileTest(src: string, filter: string, config?: any, ..._extraArgs: any[]) {
+    const launchable = new launchableObj('test', filter, src, config);
+    launchable.run();
 }
 
 // see: https://stackoverflow.com/questions/43007267/how-to-run-a-system-command-from-vscode-extension
 export function launchMainProg(src: string, config?: any, ..._extraArgs: any[]) {
-    const launchable = new launchableObj(src, config);
+    const launchable = new launchableObj('run', '', src, config);
 
     // const execShell = (cmd: string) =>
     // 	new Promise<string>((resolve, reject) => {
@@ -459,6 +472,8 @@ export const settings = {
     get disableCodeLensCmd(): string { return `${AppScopeName}.codeLens.disable`; },
     get codeLensActionCmd(): string { return `${AppScopeName}.codeLens.runOrDebug`; },
     get launchMainFuncCmd(): string { return this.codeLensActionCmd; },
+    get launchSingleTestCmd(): string { return `${AppScopeName}.codeLens.runSingleTest`; },
+    get launchFileTestCmd(): string { return `${AppScopeName}.codeLens.runFileTest`; },
 
     get enableCodeLens(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.enableCodeLens", true); },
     set enableCodeLens(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.enableCodeLens", b, true); },

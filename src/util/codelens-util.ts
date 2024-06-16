@@ -5,8 +5,8 @@ import * as vscode from 'vscode';
 // import * as fs from 'fs';
 // import Term from '../terminal/term';
 // import { AppRunTerminalName } from './consts';
-import * as su from './sbar-util';
-import { launchMainProg, settings } from './settings-util';
+// import * as su from './sbar-util';
+import { launchFileTest, launchMainProg, launchSingleTest, settings } from './settings-util';
 
 // let context: vscode.ExtensionContext;
 // let terminalOperator: Term;
@@ -15,7 +15,7 @@ export function install(c: vscode.ExtensionContext) {
     // context = c;
     // terminalOperator = new Term(c);
 
-    su.install(c); // status bar util wants to holding a context pointer
+    // su.install(c); // status bar util wants to holding a context pointer
 
     c.subscriptions.push(vscode.commands.registerCommand(settings.runAsPackageCmd, () => {
         settings.runAsPackage = true;
@@ -25,6 +25,8 @@ export function install(c: vscode.ExtensionContext) {
     }));
 
     c.subscriptions.push(vscode.commands.registerCommand(settings.codeLensActionCmd, launchMainProg));
+    c.subscriptions.push(vscode.commands.registerCommand(settings.launchSingleTestCmd, launchSingleTest));
+    c.subscriptions.push(vscode.commands.registerCommand(settings.launchFileTestCmd, launchFileTest));
 }
 
 // export function findGoMod(fromPath: string): string {

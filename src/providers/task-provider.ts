@@ -4,7 +4,7 @@ import * as cp from 'child_process';
 import * as vscode from 'vscode';
 import { error } from 'console';
 import Path from '../util/path-util';
-import { GoRunTaskDefinition, launchableObj } from '../util/settings-util';
+import { ZigRunTaskDefinition, launchableObj } from '../util/settings-util';
 import { AppScopeName, AppTitleName } from '../util/consts';
 
 const typeName = AppScopeName;
@@ -17,11 +17,11 @@ export function install(_: vscode.ExtensionContext): vscode.Disposable | undefin
         return;
     }
 
-    const taskProvider = vscode.tasks.registerTaskProvider(typeName, new GoRunTaskProvider(workspaceRoot));
+    const taskProvider = vscode.tasks.registerTaskProvider(typeName, new ZigRunTaskProvider(workspaceRoot));
     return taskProvider;
 }
 
-export class GoRunTaskProvider implements vscode.TaskProvider {
+export class ZigRunTaskProvider implements vscode.TaskProvider {
     private gorunPromise: Thenable<vscode.Task[]> | undefined = undefined;
     launchable: launchableObj | undefined = undefined;
 
@@ -74,8 +74,8 @@ export class GoRunTaskProvider implements vscode.TaskProvider {
 
             // const dir = Path.dirname(focusedFile);
             const relName = `./${Path.relative(folderString, focusedFile)}`;
-            this.launchable = new launchableObj(focusedFile);
-            const kind: GoRunTaskDefinition = {
+            this.launchable = new launchableObj('run', '', focusedFile);
+            const kind: ZigRunTaskDefinition = {
                 type: typeName,
                 task: `go-main-run ${relName}`
             };
