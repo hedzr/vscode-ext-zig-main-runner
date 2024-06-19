@@ -20,8 +20,11 @@
     "color": "#F2F2F2",
     "theme": "light"
   },
+  "extensionDependencies": [
+    "ziglang.vscode-zig"
+  ],
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.79.0"
   },
   "categories": [
     "Other",
@@ -47,8 +50,13 @@
         "category": "Zig Main Runner"
       },
       {
-        "title": "Run or Debug main()",
+        "title": "Run main()",
         "command": "zig-main-runner.codeLens.runOrDebug",
+        "category": "Zig Main Runner"
+      },
+      {
+        "title": "Debug main()",
+        "command": "zig-main-runner.codeLens.debugBinary",
         "category": "Zig Main Runner"
       },
       {
@@ -61,21 +69,30 @@
         "command": "zig-main-runner.codeLens.runAsSingleFile",
         "category": "Zig Main Runner"
       },
-
       {
         "title": "Run a Single Test",
         "command": "zig-main-runner.codeLens.runSingleTest",
         "category": "Zig Main Runner"
       },
       {
-        "title": "Run a File Test",
-        "command": "zig-main-runner.codeLens.runFileTest",
+        "title": "Debug a Single Test",
+        "command": "zig-main-runner.codeLens.debugSingleTest",
         "category": "Zig Main Runner"
       },
-
       {
-        "command": "zig-main-runner.helloWorld",
-        "title": "Hello World"
+        "title": "Run Tests in this File",
+        "command": "zig-main-runner.codeLens.runFileTests",
+        "category": "Zig Main Runner"
+      },
+      {
+        "title": "Run Tests in this Workspace",
+        "command": "zig-main-runner.codeLens.runWorkspaceTests",
+        "category": "Zig Main Runner"
+      },
+      {
+        "title": "Build this Workspace",
+        "command": "zig-main-runner.codeLens.buildWorkspace",
+        "category": "Zig Main Runner"
       }
     ],
     "configuration": {
@@ -86,6 +103,12 @@
           "default": true,
           "description": "Enable or disable Run/Debug shortcut links onto func main()",
           "order": 0
+        },
+        "zig-main-runner.main.enableCodeLensForTests": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable or disable CodeLens on Tests",
+          "order": 1
         },
         "zig-main-runner.main.run.mode": {
           "type": "string",
@@ -148,10 +171,12 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run package",
+    "vscode:prepublish": "echo pnpm run package; npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
     "compile": "webpack",
     "watch": "webpack --watch",
-    "package": "webpack --mode production --devtool hidden-source-map",
+    "package": "echo webpack --mode production --devtool hidden-source-map; pnpm vsce package --no-dependencies",
+    "publish": "pnpm vsce publish --no-dependencies",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
@@ -162,7 +187,7 @@
     "@types/common-ancestor-path": "^1.0.2",
     "@types/mocha": "^10.0.6",
     "@types/node": "~18.19.34",
-    "@types/vscode": "^1.90.0",
+    "@types/vscode": "^1.79.0",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@typescript-eslint/parser": "^7.13.0",
     "@vscode/test-cli": "^0.0.9",

@@ -76,4 +76,76 @@ npm install --global yo generator-code
 yo code
 ```
 
+## How to package and publish
+
+First, install `vsce`:
+
+```bash
+npm install -g @vscode/vsce
+```
+
+And,
+
+```bash
+$ cd myExtension
+$ vsce package
+# myExtension.vsix generated
+$ vsce publish
+# <publisher id>.myExtension published to VS Code Marketplace
+```
+
+### Got errors when packaging or publishing
+
+See also: <https://stackoverflow.com/questions/59798905/vsce-publish-fails-vs-code-extension-using-pnpm-yarn>
+
+This happens because the extension's linker fails to resolve the dependencies.
+
+To fix it do the following depending on which node package manager your repo uses:
+
+- `yarn` repo:
+
+  ```bash
+  vsce publish --yarn -p $my_token
+  ```
+
+- `pnpm` repo:
+
+  1. if you have no runtime dependencies you can keep it simple, just add this to your `package.json`
+
+     ```json
+     "scripts": {
+         "package": "pnpm vsce package --no-dependencies",
+         "publish": "pnpm vsce publish --no-dependencies"
+     }
+     ```
+
+     or run the command `vsce publish patch --no-dependencies` (use `minor` or `major` instead of `patch` as needed, see [semver](https://semver.org/))
+
+  2. if you have runtime dependencies you need to bundle them first, so additionally to (1) also add this to your `package.json`
+
+     ```json
+     "scripts": {
+         "vscode:prepublish": "npm run esbuild-base -- --minify",
+         "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node"
+     }
+     ```
+
+For either case you'll obviously need to install vsce with
+
+```bash
+pnpm i -D vsce # or `yarn add -D vsce`
+```
+
+and in the 2nd pnpm case you'll also need esbuild too
+
+```bash
+pnpm i -D esbuild
+```
+
+See more info in the [related Github issue](https://github.com/microsoft/vscode-vsce/issues/421#issuecomment-1038911725).
+
+## REFs
+
+- <https://code.visualstudio.com/api/working-with-extensions/publishing-extension>
+
 **Enjoy!**

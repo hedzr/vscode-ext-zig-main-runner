@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { LaunchMode, Store, focusedEditingFilePath, launchMainProg, runWithConfig, settings, showLaunchConfigsAndStartDebug } from './settings-util';
+import { LaunchMode, Store, focusedEditingFilePath, settings, showLaunchConfigsAndStartDebug } from './settings-util';
 import { AppScopeName } from './consts';
 
 let launchConfigsStatusBarItem: vscode.StatusBarItem;
@@ -131,13 +131,13 @@ export async function showQuickPickLaunchConfigsAndRun(_: vscode.ExtensionContex
         };
         switch (settings.launchMode) {
             case LaunchMode.RunInTerminal:
-                launchMainProg(focusedFileAbs, config);
+                // launchMainProg(focusedFileAbs, config);
                 break;
             case LaunchMode.Run:
-                runWithConfig(runCmd, config, callback);
+                // runWithConfig(runCmd, config, callback);
                 break;
             case LaunchMode.Debug:
-                runWithConfig(debugCmd, config, callback);
+                // runWithConfig(debugCmd, config, callback);
                 break;
         }
         // runWithConfig(settings.enableRunOrDebug ? runCmd : debugCmd, file);

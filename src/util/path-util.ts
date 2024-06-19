@@ -125,6 +125,8 @@ export default abstract class Path extends Base {
         return this.getShellConfig('sep');
     }
 
+    public static get sep() { return path.sep; }
+
     static fixExecutablePath(p: string): string {
         if (p.includes(' ')) {
             return `"${p}"`;

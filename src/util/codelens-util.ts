@@ -6,10 +6,12 @@ import * as vscode from 'vscode';
 // import Term from '../terminal/term';
 // import { AppRunTerminalName } from './consts';
 // import * as su from './sbar-util';
-import { launchFileTest, launchMainProg, launchSingleTest, settings } from './settings-util';
+import { settings } from './settings-util';
+import { Executor } from './exec';
 
 // let context: vscode.ExtensionContext;
 // let terminalOperator: Term;
+
 
 export function install(c: vscode.ExtensionContext) {
     // context = c;
@@ -24,65 +26,13 @@ export function install(c: vscode.ExtensionContext) {
         settings.runAsPackage = false;
     }));
 
-    c.subscriptions.push(vscode.commands.registerCommand(settings.codeLensActionCmd, launchMainProg));
-    c.subscriptions.push(vscode.commands.registerCommand(settings.launchSingleTestCmd, launchSingleTest));
-    c.subscriptions.push(vscode.commands.registerCommand(settings.launchFileTestCmd, launchFileTest));
+    let exec = new Executor();
+
+    c.subscriptions.push(vscode.commands.registerCommand(settings.codeLensActionCmd, (src: string, ...args: any[]) => { exec.runBinary(src, args); }));
+    c.subscriptions.push(vscode.commands.registerCommand(settings.codeLensActionDebugCmd, (src: string, ...args: any[]) => { exec.debugBinary(src, args); }));
+    c.subscriptions.push(vscode.commands.registerCommand(settings.launchSingleTestCmd, (src: string, filter: string, ...args: any[]) => { exec.launchSingleTest(src, filter, null, args); }));
+    c.subscriptions.push(vscode.commands.registerCommand(settings.launchSingleTestDebugCmd, (src: string, filter: string, ...args: any[]) => { exec.launchSingleTestDebug(src, filter, null, args); }));
+    c.subscriptions.push(vscode.commands.registerCommand(settings.launchFileTestsCmd, (src: string, filter: string, ...args: any[]) => { exec.launchFileTests(src, filter, null, args); }));
+    c.subscriptions.push(vscode.commands.registerCommand(settings.launchWorkspaceTestsCmd, (src: string, filter: string, ...args: any[]) => { exec.launchWorkspaceTests(src, filter, null, args); }));
+    c.subscriptions.push(vscode.commands.registerCommand(settings.launchWorkspaceBuildCmd, (_src: string, _filter: string, ..._args: any[]) => { exec.buildWorkspace(); }));
 }
-
-// export function findGoMod(fromPath: string): string {
-//     const dir = path.dirname(fromPath);
-//     const gomodfile = path.join(dir, "go.mod");
-//     if (fs.existsSync(gomodfile)) {
-//         return gomodfile;
-//     }
-//     if (dir) {
-//         return findGoMod(dir);
-//     }
-//     return '';
-// }
-
-// // see: https://stackoverflow.com/questions/43007267/how-to-run-a-system-command-from-vscode-extension
-// export function launchMainProg(src: string, ...args: any[]) {
-//     // const currFile = focusedEditingFilePath();
-//     // console.log("codelensAction.args:", args, 'file path:', currFile, 'src file:', src);
-//     const gomod = findGoMod(src);
-//     if (gomod) {
-//         const workDir = path.dirname(gomod);
-//         const mainGo = src;
-//         const mainGoDir = path.dirname(mainGo);
-//         var buildTags = vscode.workspace.getConfiguration('go').get("buildTags", 'vscode');
-//         var tags: string[] = [];
-//         buildTags.split(/[ ,]/).forEach((v, i, a) => {
-//             if (v !== '' && v !== 'vscode' && tags.indexOf(v) === -1) { tags.push(v); }
-//         });
-//         if (settings.enableVerboseBuildTag && tags.indexOf('verbose') === -1) { tags.push('verbose'); }
-//         if (settings.enableDelveBuildTag && tags.indexOf('delve') === -1) { tags.push('delve'); }
-//         settings.runBuildTags.split(/[ ,]/).forEach((v, i, a) => {
-//             if (v !== '' && tags.indexOf(v) === -1) { tags.push(v); }
-//         });
-//         if (settings.enableVscodeBuildTag && tags.indexOf('vscode') === -1) { tags.push('vscode'); }
-//         buildTags = tags.join(',');
-//         // if (!/[ ,]?vscode[ ,]?/.test(buildTags)) {
-//         //     buildTags = `${buildTags.replace(/[ ,]+$/, '')},vscode`.replace(/^[ ,]+/, '');
-//         // }
-//         const cmd = settings.runAsPackage ? `go run -tags '${buildTags}' ${mainGoDir}` : `go run -tags '${buildTags}' ${mainGo}`;
-//         console.log(`Sending command to terminal '${AppRunTerminalName}': ${cmd}`);
-
-//         // const execShell = (cmd: string) =>
-//         // 	new Promise<string>((resolve, reject) => {
-//         // 		cp.exec(cmd, (err, out) => {
-//         // 			if (err) {
-//         // 				console.log('stderr: ' + err);
-//         // 				return reject(err);
-//         // 			}
-//         // 			console.log('stdout: ' + out);
-//         // 			return resolve(out);
-//         // 		});
-//         // 	});
-//         // const cp = require('child_process')
-//         // execShell(cmd);
-
-//         // const terminal = new Term();
-//         terminalOperator.sendCommandToDefaultTerminal(workDir, cmd);
-//     }
-// }

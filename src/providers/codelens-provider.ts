@@ -4,7 +4,7 @@ import path from 'path';
 import * as vscode from 'vscode';
 import { AppScopeName, ZigLangId } from '../util/consts';
 import * as cu from '../util/codelens-util';
-import { TSettings, settings } from '../util/settings-util';
+import { TSettings, settings, findModDefFile } from '../util/settings-util';
 
 // interface M1<T> {
 // 	[index: string]: T,
@@ -53,27 +53,16 @@ class DebugFileCodeLens extends FileCodeLens {
 		this.command = {
 			title: "Debug",
 			tooltip: "Debug main() function",
-			command: "workbench.action.debug.start",
+			command: settings.codeLensActionDebugCmd,
+			// command: "workbench.action.debug.start",
 			arguments: [this.file],
 			// when: "debuggersAvailable && debugState == 'inactive'"
 		};
 	}
 }
 
-class TestFileCodeLens extends FileCodeLens {
-	constructor(file: string, range: vscode.Range, filter: string, command?: vscode.Command) {
-		super(file, range, command);
-		// super.command = opts;
-		this.command = {
-			title: "Test the file", // title: `$(debug-start) Run`,
-			tooltip: "Run all tests in this file",
-			command: settings.launchFileTestCmd,
-			arguments: [this.file, filter]
-		};
-	}
-}
-
 class TestSingleCodeLens extends FileCodeLens {
+	arguments: string[] = [];
 	constructor(file: string, range: vscode.Range, filter: string, command?: vscode.Command) {
 		super(file, range, command);
 		// super.command = opts;
@@ -82,6 +71,61 @@ class TestSingleCodeLens extends FileCodeLens {
 			tooltip: "Run this single test",
 			command: settings.launchSingleTestCmd,
 			arguments: [this.file, filter]
+		};
+	}
+	toString(): string { return this.arguments.length > 1 ? this.arguments[1] : ''; }
+}
+
+class DebugTestSingleCodeLens extends FileCodeLens {
+	arguments: string[] = [];
+	constructor(file: string, range: vscode.Range, filter: string, command?: vscode.Command) {
+		super(file, range, command);
+		// super.command = opts;
+		this.command = {
+			title: "Debug test", // title: `$(debug-start) Run`,
+			tooltip: "Debug this single test",
+			command: settings.launchSingleTestDebugCmd,
+			arguments: [this.file, filter]
+		};
+	}
+	toString(): string { return this.arguments.length > 1 ? this.arguments[1] : ''; }
+}
+
+class TestFileCodeLens extends FileCodeLens {
+	constructor(file: string, range: vscode.Range, filter: string, command?: vscode.Command) {
+		super(file, range, command);
+		// super.command = opts;
+		this.command = {
+			title: "▷ Test the file", // title: `$(debug-start) Run`,
+			tooltip: "Run all tests in this file",
+			command: settings.launchFileTestsCmd,
+			arguments: [this.file, filter]
+		};
+	}
+}
+
+class TestWorkspaceCodeLens extends FileCodeLens {
+	constructor(file: string, range: vscode.Range, _filter: string, command?: vscode.Command) {
+		super(file, range, command);
+		// super.command = opts;
+		this.command = {
+			title: "Test the workspace", // title: `$(debug-start) Run`,
+			tooltip: "Run all tests in this workspace",
+			command: settings.launchWorkspaceTestsCmd,
+			arguments: ['', '']
+		};
+	}
+}
+
+class BuildWorkspaceCodeLens extends FileCodeLens {
+	constructor(file: string, range: vscode.Range, _filter: string, command?: vscode.Command) {
+		super(file, range, command);
+		// super.command = opts;
+		this.command = {
+			title: "Build the workspace", // title: `$(debug-start) Run`,
+			tooltip: "Build this workspace",
+			command: settings.launchWorkspaceBuildCmd,
+			arguments: ['', '']
 		};
 	}
 }
@@ -109,16 +153,16 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 	private regex: RegExp;
 	private regexZig: RegExp;
 	private regexZigTests: RegExp;
-	private locations: LocT[] = [];
+	// private locations: LocT[] = [];
 	private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
 	public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
 
 	constructor() {
 		// see: https://regex101.com/r/BVRyIR/1
-		this.regex = /(?=\n?)func main\(\) (.*)/g;
+		this.regex = /(?=\n?)func main\(\) ([^{]*)/g;
 		// this.regex = /(.+)/g;
-		this.regexZig = /(?=\n?)pub fn main\(\) void (.*)/g;
-		this.regexZigTests = /(?=\n?)test \"([^"]*)\" (.*)/g;
+		this.regexZig = /^pub fn main\(\) !?void [^{]*\{/gm;
+		this.regexZigTests = /^test \"?([^"{]*)\"? [^{]*\{/gm;
 
 		vscode.workspace.onDidChangeConfiguration((_) => {
 			this._onDidChangeCodeLenses.fire();
@@ -173,16 +217,16 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 		}));
 	}
 
-	public provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
+	public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
 		if (settings.enableCodeLens) {
-			this.codeLenses = [];
-			this.locations = [];
-
-			console.log('doc: ', document.fileName, ', lang: ', document.languageId);
-			let matches;
 			const iszig = document.languageId === ZigLangId;
 			const regex = new RegExp(iszig ? this.regexZig : this.regex);
 			const text = document.getText();
+
+			console.log('[func main] doc: ', document.fileName, ', token', token, ', lang: ', document.languageId, ", zig: ", iszig, ", settings.enableTestsCodeLens: ", settings.enableTestsCodeLens);
+			var codeLenses: vscode.CodeLens[] = [];
+			// var locations: LocT[] = [];
+			let matches;
 			while ((matches = regex.exec(text)) !== null) {
 				const line = document.lineAt(document.positionAt(matches.index).line);
 				const indexOf = line.text.indexOf(matches[0]);
@@ -190,36 +234,65 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 				const range = document.getWordRangeAtPosition(position, new RegExp(iszig ? this.regexZig : this.regex));
 				if (range) {
 					// const loc = new Loc(document.fileName, range);
-					const loc = <LocT>{ file: document.fileName, range: range };
-					this.codeLenses.push(new RunFileCodeLens(document.fileName, range));
-					this.codeLenses.push(new DebugFileCodeLens(document.fileName, range));
-					this.locations.push(loc);
+					// const loc = <LocT>{ file: document.fileName, range: range };
+					codeLenses.push(new RunFileCodeLens(document.fileName, range));
+					codeLenses.push(new DebugFileCodeLens(document.fileName, range));
+					// locations.push(loc);
 					// console.log('[func main] add location: ', loc);
 				}
 			}
-			console.log('[func main] locations: ', this.locations);
+
+			const line1 = document.lineAt(0);
+			const position1 = new vscode.Position(line1.lineNumber, 0);
+			const range1 = document.getWordRangeAtPosition(position1); //, new RegExp(this.regexZigTests));
 
 			if (iszig) {
+				let moduleConfigFile = findModDefFile(document.fileName, 'build.zig');
+				if (moduleConfigFile) {
+					codeLenses.push(new TestWorkspaceCodeLens(document.fileName, range1, ''));
+					codeLenses.push(new BuildWorkspaceCodeLens(document.fileName, range1, ''));
+				}
+			}
+
+			if (settings.enableTestsCodeLens && iszig) {
+				let ix = 0;
 				while ((matches = this.regexZigTests.exec(text)) !== null) {
 					const line = document.lineAt(document.positionAt(matches.index).line);
-					const indexOf = line.text.indexOf(matches[0]);
-					const position = new vscode.Position(line.lineNumber, indexOf);
-					const range = document.getWordRangeAtPosition(position, new RegExp(this.regexZigTests));
-					if (range) {
-						const loc = <LocT>{ file: document.fileName, range: range };
-						this.codeLenses.push(new TestSingleCodeLens(document.fileName, range, matches[1]));
-						this.codeLenses.push(new TestFileCodeLens(document.fileName, range, ''));
-						this.locations.push(loc);
+					const indexOf = line.text.indexOf(matches[1]);
+					if (indexOf > 0) {
+						const position = new vscode.Position(line.lineNumber, indexOf);
+						const range = document.getWordRangeAtPosition(position); //, new RegExp(this.regexZigTests));
+						if (range) {
+							// const loc = <LocT>{ file: document.fileName, range: range };
+							codeLenses.push(new TestSingleCodeLens(document.fileName, range, matches[1]));
+							codeLenses.push(new DebugTestSingleCodeLens(document.fileName, range, matches[1]));
+							// locations.push(loc);
+							// console.log(`[func main] add test location ${ix}: `, matches[1], range);
+							ix++;
+						}
+					} else {
+						console.warn(`[func main] test |||${matches[1]}||| not ok, indexOf == -1`);
+					}
+				}
+				// console.log('[func main] ix', ix);
+
+				if (range1) {
+					if (ix > 0) {
+						codeLenses.push(new TestFileCodeLens(document.fileName, range1, ''));
 					}
 				}
 			}
+
+			this.codeLenses = codeLenses;
+			// this.locations = locations;
+			console.log('[func main] codelenses calculated: ', this.codeLenses);
 			return this.codeLenses;
 		}
 		return [];
 	}
 
 	public resolveCodeLens(codeLens: vscode.CodeLens, _token: vscode.CancellationToken) {
-		if (settings.enableCodeLens) {
+		if (settings.enableCodeLens || settings.enableTestsCodeLens) {
 			// console.log("codelens:", codeLens);
 			return codeLens;
 		}
