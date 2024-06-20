@@ -120,17 +120,36 @@
           "description": "run mode of 'zig run'",
           "order": 100
         },
-        "zig-main-runner.main.run.asPackage": {
-          "type": "boolean",
-          "default": true,
-          "title": "Run main func under package context",
-          "description": "Run main func under package context or not (default is running the single file)",
-          "order": 101
+        "zig-main-runner.test.args": {
+          "type": "string",
+          "default": "",
+          "title": "Testing Args in Additional",
+          "description": "Add additional args when launch any test case",
+          "order": 120
         },
-        "zig-main-runner.main.run.verbose": {
-          "type": "boolean",
-          "default": false,
-          "description": "add '-v' to 'zig run'",
+        "zig-main-runner.test.binary-path": {
+          "type": "string",
+          "default": "",
+          "title": "Testing Binary Path",
+          "description": "Optional binary path for testing. Default is './zig-out/debug/test/'",
+          "order": 121
+        },
+        "zig-main-runner.debug.type": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "lldb",
+            "cppvsdbg",
+            "gdb"
+          ],
+          "enumDescriptions": [
+            "Detect OS platform automatically",
+            "LLDB",
+            "Visual Studio cppvsdbg tool",
+            "GDB"
+          ],
+          "default": "auto",
+          "description": "Choose the debug backend",
           "order": 150
         },
         "zig-main-runner.launch.mode": {

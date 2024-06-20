@@ -308,11 +308,11 @@ export const settings = {
 
     get testArgs() {
         const config = vscode.workspace.getConfiguration(AppScopeName);
-        return config.get<string>("testArgs") || undefined;
+        return config.get<string>("test.args") || undefined;
     },
     get debugType(): string {
         const config = vscode.workspace.getConfiguration(AppScopeName);
-        return config.get<string>("debugType") || this.debugTypeForPlatform(os.platform());
+        return config.get<string>("debug.type") || this.debugTypeForPlatform(os.platform());
     },
     debugTypeForPlatform(platform: NodeJS.Platform): string {
         switch (platform) {
@@ -327,7 +327,7 @@ export const settings = {
     get debugEnv() {
         const config = vscode.workspace.getConfiguration(AppScopeName);
         return {
-            testBinaryPath: config.get<string>("testBinaryPath") || defaultTestBinaryPath,
+            testBinaryPath: config.get<string>("test.binary-path") || defaultTestBinaryPath,
         };
     },
 
@@ -342,55 +342,55 @@ export const settings = {
     get runAsPackage(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.asPackage", true); },
     set runAsPackage(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.asPackage", b, true); },
 
-    get enableVerboseBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableVerbose`; },
-    get disableVerboseBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableVerbose`; },
-    get toggleVerboseBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleVerbose`; },
+    // get enableVerboseBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableVerbose`; },
+    // get disableVerboseBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableVerbose`; },
+    // get toggleVerboseBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleVerbose`; },
 
-    get enableDelveBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableDelve`; },
-    get disableDelveBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableDelve`; },
-    get toggleDelveBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleDelve`; },
+    // get enableDelveBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableDelve`; },
+    // get disableDelveBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableDelve`; },
+    // get toggleDelveBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleDelve`; },
 
-    get enableDockerBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableDocker`; },
-    get disableDockerBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableDocker`; },
-    get toggleDockerBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleDocker`; },
+    // get enableDockerBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableDocker`; },
+    // get disableDockerBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableDocker`; },
+    // get toggleDockerBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleDocker`; },
 
-    get enableK8sBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableK8s`; },
-    get disableK8sBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableK8s`; },
-    get toggleK8sBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleK8s`; },
+    // get enableK8sBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableK8s`; },
+    // get disableK8sBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableK8s`; },
+    // get toggleK8sBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleK8s`; },
 
-    get enableIstioBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableIstio`; },
-    get disableIstioBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableIstio`; },
-    get toggleIstioBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleIstio`; },
+    // get enableIstioBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableIstio`; },
+    // get disableIstioBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableIstio`; },
+    // get toggleIstioBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleIstio`; },
 
-    get enableVscodeBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableVscode`; },
-    get disableVscodeBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableVscode`; },
-    get toggleVscodeBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleVscode`; },
+    // get enableVscodeBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.enableVscode`; },
+    // get disableVscodeBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.disableVscode`; },
+    // get toggleVscodeBuildTagCmd(): string { return `${AppScopeName}.codeLens.buildTags.toggleVscode`; },
 
-    get enableVerboseBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.verbose", false); },
-    set enableVerboseBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.verbose", b, true); },
-    get enableDelveBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.delve", false); },
-    set enableDelveBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.delve", b, true); },
-    get enableDockerBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.docker", false); },
-    set enableDockerBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.docker", b, true); },
-    get enableK8sBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.k8s", false); },
-    set enableK8sBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.k8s", b, true); },
-    get enableIstioBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.istio", false); },
-    set enableIstioBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.istio", b, true); },
-    get enableVscodeBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.vscode", true); },
-    set enableVscodeBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.vscode", b, true); },
+    // get enableVerboseBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.verbose", false); },
+    // set enableVerboseBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.verbose", b, true); },
+    // get enableDelveBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.delve", false); },
+    // set enableDelveBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.delve", b, true); },
+    // get enableDockerBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.docker", false); },
+    // set enableDockerBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.docker", b, true); },
+    // get enableK8sBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.k8s", false); },
+    // set enableK8sBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.k8s", b, true); },
+    // get enableIstioBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.istio", false); },
+    // set enableIstioBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.istio", b, true); },
+    // get enableVscodeBuildTag(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.tags.vscode", true); },
+    // set enableVscodeBuildTag(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.vscode", b, true); },
 
-    get runBuildTagsCmd(): string { return `${AppScopeName}.build-tags`; },
-    get runBuildTags(): string { return vscode.workspace.getConfiguration(AppScopeName).get<string>("main.run.tags.more", ''); },
-    set runBuildTags(b: string) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.more", b, true); },
-    get runConfigs(): any[] { return vscode.workspace.getConfiguration(AppScopeName).get<any[]>("main.run.configs", []); },
-    set runConfigs(b: any[]) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.configs", b, true); },
+    // get runBuildTagsCmd(): string { return `${AppScopeName}.build-tags`; },
+    // get runBuildTags(): string { return vscode.workspace.getConfiguration(AppScopeName).get<string>("main.run.tags.more", ''); },
+    // set runBuildTags(b: string) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.tags.more", b, true); },
+    // get runConfigs(): any[] { return vscode.workspace.getConfiguration(AppScopeName).get<any[]>("main.run.configs", []); },
+    // set runConfigs(b: any[]) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.configs", b, true); },
 
-    get gorunVerbose(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.verbose", false); },
-    set gorunVerbose(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.verbose", b, true); },
-    get gorunMinSize(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.min-size", true); },
-    set gorunMinSize(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.min-size", b, true); },
-    get disableLocalInlineOptimizations(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.no-optimize", false); },
-    set disableLocalInlineOptimizations(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.no-optimize", b, true); },
+    // get gorunVerbose(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.verbose", false); },
+    // set gorunVerbose(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.verbose", b, true); },
+    // get gorunMinSize(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.min-size", true); },
+    // set gorunMinSize(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.min-size", b, true); },
+    // get disableLocalInlineOptimizations(): boolean { return vscode.workspace.getConfiguration(AppScopeName).get<boolean>("main.run.no-optimize", false); },
+    // set disableLocalInlineOptimizations(b: boolean) { vscode.workspace.getConfiguration(AppScopeName).update("main.run.no-optimize", b, true); },
 
 } as const;
 
