@@ -4,6 +4,12 @@ All notable changes to the "zig-main-runner" extension will be documented in thi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## History
+
+### v1.0.1
+
+- First Public Release
+
+### [Unreleased]
 
 - Initial release
