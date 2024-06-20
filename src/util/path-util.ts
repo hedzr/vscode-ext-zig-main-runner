@@ -379,4 +379,4 @@ export const execPaths = {
             return Path.fixExecutablePath(npm);
         }
     }
-};
+} as const;

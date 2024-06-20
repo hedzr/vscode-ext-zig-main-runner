@@ -183,7 +183,7 @@ export class Executor {
         return cmdline;
     }
 
-    private asTask(_task?: vscode.Task, source?: string): vscode.Task | undefined {
+    public asTask(_task?: vscode.Task, source?: string): vscode.Task | undefined {
         const task = _task?.definition.task;
         // A Rake task consists of a task and an optional file as specified in RakeTaskDefinition
         // Make sure that this looks like a Rake task by checking that there is a task.
@@ -278,7 +278,6 @@ export class Executor {
         if (!testName) { return; };
 
         const debugEnv = settings.debugEnv;
-
         const binPath = debugEnv.testBinaryPath;
         tool.mkdirp(Path.resolve(env.cwd, binPath)); // ensure that output directory exists
 
