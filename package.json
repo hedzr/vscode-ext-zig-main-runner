@@ -2,7 +2,7 @@
   "name": "zig-main-runner",
   "displayName": "zig main runner",
   "description": "run zig main func and tests in-place",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "hedzr",
   "license": "Apache 2.0",
   "repository": {

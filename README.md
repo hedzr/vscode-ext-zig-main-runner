@@ -1,6 +1,16 @@
 # zig-main-runner README
 
-"zig-main-runner": Run or Debug zig main function in-place.
+Run or Debug zig main function in-place.
+
+Also, Run or Debug test cases, build the whole workspace.
+
+## What's New?
+
+See the [CHANGELOG](https://marketplace.visualstudio.com/items/hedzr.zig-main-runner/changelog).
+
+- v1.0.2
+  - NOTE while you're debugging main(), kept its binary target name samed with its directory name.
+  - Fix debugType === 'auto'
 
 ## Features
 
@@ -11,12 +21,11 @@ This extension adds few [commands](https://code.visualstudio.com/api/extension-g
 - Run tests in a file
 - Run tests in the workspace
 - Build workspace
-- Zig Main Runner: Debug test
-- Zig Main Runner: Debug binary
+- Debug test
 
 We add some codelens links at the top of function main(), tests, and first line of a zig file, like the following![image-20240620081753359](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/upgit/2024/06/20240620_1718845604.png)
 
-Our inspiration is from [go-main-runner](https://marketplace.visualstudio.com/items?itemName=hedzr.go-main-runner), and [zig-language-extras](https://marketplace.visualstudio.com/items?itemName=ianic.zig-language-extras).
+Our inspirations are from [go-main-runner](https://marketplace.visualstudio.com/items?itemName=hedzr.go-main-runner), and [zig-language-extras](https://marketplace.visualstudio.com/items?itemName=ianic.zig-language-extras).
 
 ## Requirements
 
@@ -90,7 +99,18 @@ The launching of main() function will be emitted to a Terminal window (as a vsco
 >
 > It is useful while you are invoking `main.zig` again and again.
 
-When you're using Zig build.zig, only one main() can be supported because we have no plan to analysis `build.zig` for multiple executables.
+When you're debugging with Zig build.zig, only a main() whom has same name with its directory name can be supported because we have no plan to analysis `build.zig` for multiple executables. This structure is good:
+
+```bash
+<root>
+  - src/
+    - example/
+      main.zig  # exe target should be named to 'example'
+    main.zig    # exe target should be named to '<root>'
+    build.zig
+```
+
+
 
 ### Build the Workspace
 
