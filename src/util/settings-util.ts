@@ -312,7 +312,8 @@ export const settings = {
     },
     get debugType(): string {
         const config = vscode.workspace.getConfiguration(AppScopeName);
-        return config.get<string>("debug.type") || this.debugTypeForPlatform(os.platform());
+        const type = config.get<string>("debug.type") || this.debugTypeForPlatform(os.platform());
+        return type === 'auto' ? this.debugTypeForPlatform(os.platform()) : type;
     },
     debugTypeForPlatform(platform: NodeJS.Platform): string {
         switch (platform) {
