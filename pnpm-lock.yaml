@@ -19,16 +19,16 @@ importers:
         specifier: ^10.0.6
         version: 10.0.6
       '@types/node':
-        specifier: ~18.19.34
+        specifier: ~18.19.36
         version: 18.19.36
       '@types/vscode':
-        specifier: ^1.79.0
+        specifier: ^1.90.0
         version: 1.90.0
       '@typescript-eslint/eslint-plugin':
-        specifier: ^7.13.0
+        specifier: ^7.13.1
         version: 7.13.1(@typescript-eslint/parser@7.13.1(eslint@9.26.0(hono@4.11.7))(typescript@5.4.5))(eslint@9.26.0(hono@4.11.7))(typescript@5.4.5)
       '@typescript-eslint/parser':
-        specifier: ^7.13.0
+        specifier: ^7.13.1
         version: 7.13.1(eslint@9.26.0(hono@4.11.7))(typescript@5.4.5)
       '@vscode/test-cli':
         specifier: ^0.0.9
