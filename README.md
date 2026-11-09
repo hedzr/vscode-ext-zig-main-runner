@@ -1,4 +1,4 @@
-# zig-main-runner README
+ext install hedzr.zig-main-runner# zig-main-runner README
 
 Run or Debug zig main function in-place.
 
